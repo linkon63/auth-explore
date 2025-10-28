@@ -7,8 +7,27 @@ const router = express.Router();
 
 // get all notes for current user
 router.get('/', authenticateToken, (req, res) => {
-  const rows = db.prepare('SELECT id, title, content, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY updated_at DESC').all(req.user.id);
-  res.json({ notes: rows });
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  console.log('page', page, 'limit', limit, 'offset', offset);
+
+  const rows = db
+    .prepare('SELECT id, title, content, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?')
+    .all(req.user.id, limit, offset);
+
+  const countResult = db
+    .prepare('SELECT COUNT(*) AS total FROM notes WHERE user_id = ?')
+    .get(req.user.id);
+
+  const totalCount = countResult.total;
+  const totalPages = Math.ceil(totalCount / limit);
+
+  console.log('totalCount', totalCount);
+  console.log('totalPages', totalPages);
+
+  res.json({ notes: rows, count: totalCount, totalPages });
 });
 
 // get single note

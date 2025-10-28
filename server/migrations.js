@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS notes (
   user_id INTEGER NOT NULL,
   title TEXT,
   content TEXT,
+  files TEXT, -- new column for uploaded file URLs
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
