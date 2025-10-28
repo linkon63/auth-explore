@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from '@/src/contexts/AuthContext';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { NoteList } from '@/components/notes/NoteList';
+import NodeDetails from '@/components/notes/NodeDetails';
 import type { JSX } from 'react';
 
 function App() {
@@ -20,6 +21,19 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/notes"
+            element={
+              <ProtectedRoute>
+                <NoteList />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/notes/:id" element={
+            <ProtectedRoute>
+              <NodeDetails />
+            </ProtectedRoute>
+          } />
         </Routes>
       </Router>
     </AuthProvider>

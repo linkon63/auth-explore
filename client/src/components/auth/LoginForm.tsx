@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+
 import { useAuth } from '@/src/contexts/AuthContext';
 import { Apple, Lock, Mail } from 'lucide-react';
 
@@ -33,18 +34,31 @@ export function LoginForm() {
     try {
       setIsLoading(true);
       setError('');
-      await login(values.email, values.password);
-      navigate('/');
+
+      // Call the API directly
+      const response = await login(values.email, values.password);
+      console.log('Login response', response);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      
+      // If we have a token, call the login function from AuthContext
+      if (response.token) {
+        navigate('/');
+      } else {
+        throw new Error('No token received');
+      }
     } catch (err) {
-      setError('Incorrect email or password. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md mx-auto">
+    <div className="flex items-center justify-center h-screen">
+      <div className="w-auto mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-6 border border-gray-200 w-full">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900">

@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
 
     const user = { id: info.lastInsertRowid, email };
     const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: TOKEN_EXP });
-
+    console.log('Register response:', { token, user });
     res.json({ token, user });
   } catch (err) {
     if (err && err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
