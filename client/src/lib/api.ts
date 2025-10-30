@@ -12,17 +12,17 @@ export const auth = {
 };
 
 export const notes = {
-  getAll: async () => {
+  getAll: async (page = 1, limit = 10) => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
-    }
-    const response = await fetch(`${API_URL}/notes`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    if (!token) throw new Error('No token found');
+
+    const response = await fetch(
+      `${API_URL}/notes?page=${page}&limit=${limit}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
     return response.json();
   },
-  create: async (note: { title: string; content: string }) => {
+  create: async (note: { title: string; content: string; file: { name: string; url: string }[] }) => {
     const token = localStorage.getItem('token');
     console.log('Creating note with token', token, note);
     if (!token) {

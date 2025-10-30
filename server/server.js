@@ -4,6 +4,8 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const noteRoutes = require('./routes/notes');
 const uploadRoute = require('./routes/upload');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const path = require('path');
 

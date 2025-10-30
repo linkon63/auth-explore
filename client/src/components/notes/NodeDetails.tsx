@@ -29,6 +29,7 @@ export default function NodeDetails() {
 
     try {
       const data = await notes.getOne(id);
+      console.log("data", data);
       setNote(data.note);
       setFormData({
         title: data.note.title,

@@ -14,7 +14,7 @@ router.get('/', authenticateToken, (req, res) => {
   console.log('page', page, 'limit', limit, 'offset', offset);
 
   const rows = db
-    .prepare('SELECT id, title, content, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?')
+    .prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?')
     .all(req.user.id, limit, offset);
 
   const countResult = db
@@ -32,7 +32,8 @@ router.get('/', authenticateToken, (req, res) => {
 
 // get single note
 router.get('/:id', authenticateToken, (req, res) => {
-  const row = db.prepare('SELECT id, title, content, created_at, updated_at FROM notes WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  const row = db.prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
+  console.log('row', row);
   if (!row) return res.status(404).json({ error: 'not found' });
   res.json({ note: row });
 });
@@ -45,7 +46,8 @@ router.post('/', authenticateToken, (req, res) => {
     console.log('Creating note with token', title, content);
     const stmt = db.prepare('INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)');
     const info = stmt.run(req.user.id, title, content);
-    const note = db.prepare('SELECT id, title, content, created_at, updated_at FROM notes WHERE id = ?').get(info.lastInsertRowid);
+    const note = db.prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE id = ?').get(info.lastInsertRowid);
+    console.log('note', note);
     res.status(201).json({ note });
   } catch (error) {
     console.error(error);
@@ -56,11 +58,12 @@ router.post('/', authenticateToken, (req, res) => {
 // update note
 router.put('/:id', authenticateToken, (req, res) => {
   try {
-    const { title, content } = req.body;
-    const stmt = db.prepare('UPDATE notes SET title = ?, content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?');
-    const info = stmt.run(title, content, req.params.id, req.user.id);
+    const { title, content, file } = req.body;
+    const stmt = db.prepare('UPDATE notes SET title = ?, content = ?, file = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?');
+    const info = stmt.run(title, content, file, req.params.id, req.user.id);
     if (info.changes === 0) return res.status(404).json({ error: 'not found or no permission' });
-    const note = db.prepare('SELECT id, title, content, created_at, updated_at FROM notes WHERE id = ?').get(req.params.id);
+    const note = db.prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE id = ?').get(req.params.id);
+    console.log('note', note);
     res.json({ note });
   } catch (error) {
     console.error(error);
