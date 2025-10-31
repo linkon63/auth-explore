@@ -1,52 +1,76 @@
 // server/routes/notes.js
+const { PrismaClient } = require("@prisma/client");
+const { withAccelerate } = require("@prisma/extension-accelerate");
+
 const express = require('express');
-const db = require('../db');
+
 const authenticateToken = require('../middleware/auth');
 
 const router = express.Router();
 
+const prisma = new PrismaClient().$extends(withAccelerate())
+
 // get all notes for current user
-router.get('/', authenticateToken, (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 10;
   const offset = (page - 1) * limit;
 
   console.log('page', page, 'limit', limit, 'offset', offset);
 
-  const rows = db
-    .prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?')
-    .all(req.user.id, limit, offset);
+  const notes = await prisma.note.findMany({
+    where: {
+      userId: Number(req.user.id),
+    },
+    take: limit,
+    skip: offset,
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  });
 
-  const countResult = db
-    .prepare('SELECT COUNT(*) AS total FROM notes WHERE user_id = ?')
-    .get(req.user.id);
+  const count = await prisma.note.count({
+    where: {
+      userId: Number(req.user.id),
+    },
+  });
 
-  const totalCount = countResult.total;
-  const totalPages = Math.ceil(totalCount / limit);
+  const totalPages = Math.ceil(count / limit);
 
-  console.log('totalCount', totalCount);
+  console.log('notes', notes);
+  console.log('count', count);
   console.log('totalPages', totalPages);
 
-  res.json({ notes: rows, count: totalCount, totalPages });
+  res.json({ notes, count, totalPages });
 });
 
 // get single note
-router.get('/:id', authenticateToken, (req, res) => {
-  const row = db.prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
-  console.log('row', row);
-  if (!row) return res.status(404).json({ error: 'not found' });
-  res.json({ note: row });
+router.get('/:id', authenticateToken, async(req, res) => {
+  const note = await prisma.note.findUnique({
+    where: {
+      id: Number(req.params.id),
+      userId: Number(req.user.id),
+    },
+  })
+  console.log('note', note);
+  if (!note) return res.status(404).json({ error: 'not found' });
+  res.json({ note });
 });
 
 // create note
-router.post('/', authenticateToken, (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     console.log('Creating note with token', req.body);
-    const { title, content } = req.body;
-    console.log('Creating note with token', title, content);
-    const stmt = db.prepare('INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)');
-    const info = stmt.run(req.user.id, title, content);
-    const note = db.prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE id = ?').get(info.lastInsertRowid);
+    const { title, content, file } = req.body;
+    console.log('Creating note with token', title, content, file);
+    const note = await prisma.note.create({
+      data: {
+        title,
+        content,
+        userId: Number(req.user.id),
+        file
+      },
+    });
     console.log('note', note);
     res.status(201).json({ note });
   } catch (error) {
@@ -56,13 +80,20 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 // update note
-router.put('/:id', authenticateToken, (req, res) => {
+router.put('/:id', authenticateToken, async(req, res) => {
   try {
     const { title, content, file } = req.body;
-    const stmt = db.prepare('UPDATE notes SET title = ?, content = ?, file = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?');
-    const info = stmt.run(title, content, file, req.params.id, req.user.id);
-    if (info.changes === 0) return res.status(404).json({ error: 'not found or no permission' });
-    const note = db.prepare('SELECT id, title, content, file, created_at, updated_at FROM notes WHERE id = ?').get(req.params.id);
+    const note = await prisma.note.update({
+      where: {
+        id: Number(req.params.id),
+        userId: Number(req.user.id),
+      },
+      data: {
+        title,
+        content,
+        file,
+      },
+    });
     console.log('note', note);
     res.json({ note });
   } catch (error) {
@@ -72,12 +103,18 @@ router.put('/:id', authenticateToken, (req, res) => {
 });
 
 // delete note
-router.delete('/:id', authenticateToken, (req, res) => {
+router.delete('/:id', authenticateToken, async(req, res) => {
   try {
-    const stmt = db.prepare('DELETE FROM notes WHERE id = ? AND user_id = ?');
-    const info = stmt.run(req.params.id, req.user.id);
-    console.log('Deleted note with token', req.params.id, req.user.id);
-    if (info.changes === 0) return res.status(404).json({ error: 'not found or no permission' });
+    console.log('Deleting note with token', req.params.id, req.user.id);
+    const note = await prisma.note.delete({
+      where: {
+        id: Number(req.params.id),
+        userId: Number(req.user.id),
+      },
+    })
+    console.log("note", note)
+    console.log('Deleted note with token', req.params.id, req.id);
+    if (!note) return res.status(404).json({ error: 'not found or no permission' });
     res.json({ success: true });
   } catch (error) {
     console.error(error);

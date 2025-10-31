@@ -15,6 +15,7 @@ A full-stack authentication system built with Node.js, Express, and React.
 - Node.js (v16 or higher)
 - npm or yarn
 - MongoDB (local or Atlas)
+- Prisma db - https://console.prisma.io/wkr1iefk57d28asqmd2cm2dw/cmhcwm5n3087hwceawlnwvsdb/cmhcwm5n3087iwceaih5xuu3n/studio#table=User&schema=public&view=table
 
 ## Getting Started
 
