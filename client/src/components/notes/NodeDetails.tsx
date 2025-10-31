@@ -8,6 +8,7 @@ interface Note {
   id: string;
   title: string;
   content: string;
+  file: { fileName: string; url: string }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -22,6 +23,7 @@ export default function NodeDetails() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
+    file: [{ fileName: "", url: "" }],
   });
 
   const fetchNote = async () => {
@@ -34,12 +36,23 @@ export default function NodeDetails() {
       setFormData({
         title: data.note.title,
         content: data.note.content,
+        file: data.note.file,
       });
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch note");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteFile = (fileName: string) => {
+    try {
+      const name = fileName
+      console.log('fileName', name)
+    }
+    catch (err) {
+      console.log('err',err)
     }
   };
 
@@ -153,6 +166,32 @@ export default function NodeDetails() {
             />
           </div>
 
+          <div className="p-2 grid grid-cols-3 border">
+            {note.file.length > 0 && (
+              <div className="">
+                <div className="grid grid-cols-2 gap-4">
+                  {note.file.map((file) => (
+                    <div key={file.fileName} className="relative">
+                      <img
+                        src={file.url}
+                        alt={file.fileName}
+                        className="w-[200px] h-[200px] object-cover"
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => handleDeleteFile(file.fileName)}
+                        variant="ghost"
+                        className="absolute top-2 right-2 rounded-full hover:bg-red-100"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex space-x-2">
             <Button type="submit" disabled={loading}>
               {loading ? (
@@ -170,6 +209,7 @@ export default function NodeDetails() {
                 setFormData({
                   title: note.title,
                   content: note.content,
+                  file: note.file,
                 });
               }}
               disabled={loading}
@@ -184,8 +224,18 @@ export default function NodeDetails() {
           <div className="whitespace-pre-line bg-white p-6 rounded-lg border">
             {note.content}
           </div>
+          <div className="mt-4 border grid grid-cols-3 gap-4 p-2 relative">
+            {note.file.map((file) => (
+              <img
+                key={file.fileName}
+                src={file.url}
+                alt={file.fileName}
+                className="w-[200px] h-[200px] object-cover"
+              />
+            ))}
+          </div>
           <p className="text-sm text-gray-500 mt-4">
-            Last updated: {new Date(note.updatedAt).toLocaleString()}
+            Last update: {new Date(note.updatedAt).toLocaleString()}
           </p>
         </div>
       )}

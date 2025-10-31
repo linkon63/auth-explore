@@ -17,13 +17,13 @@ const TOKEN_EXP = '1h'; // access token expiry
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     console.log('Register request:', { email, password });
     if (!email || !password) return res.status(400).json({ error: 'email and password required' });
 
     const password_hash = await bcrypt.hash(password, 10);
     const info = await prisma.user.create({
-      data: { email, password:password_hash },
+      data: { email, password:password_hash, name },
     });
     console.log('Register info:', info);
 
