@@ -83,6 +83,8 @@ router.post('/', authenticateToken, async (req, res) => {
 router.put('/:id', authenticateToken, async(req, res) => {
   try {
     const { title, content, file } = req.body;
+    console.log('Updating note with token', title, content, file);
+  
     const note = await prisma.note.update({
       where: {
         id: Number(req.params.id),

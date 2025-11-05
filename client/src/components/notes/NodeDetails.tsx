@@ -46,13 +46,15 @@ export default function NodeDetails() {
     }
   };
 
-  const handleDeleteFile = (fileName: string) => {
+  const handleDeleteFile = (file: any) => {
     try {
-      const name = fileName
-      console.log('fileName', name)
-    }
-    catch (err) {
-      console.log('err',err)
+      const name = file.filename;
+      const filterNoteFile =
+        note && note.file.filter((file) => file.filename !== name);
+      setNote({ ...note, file: filterNoteFile });
+      // setFormData({ ...formData, file: filterNoteFile });
+    } catch (err) {
+      console.log("err", err);
     }
   };
 
@@ -73,8 +75,36 @@ export default function NodeDetails() {
 
     try {
       setLoading(true);
-      await notes.update(id, formData);
-      await fetchNote();
+      // await notes.update(id, formData);
+      // remove files
+      console.log("formData", formData.file);
+      console.log("note", note?.file);
+      const removeFiles = formData.file.filter(
+        (file) => !note?.file.includes(file)
+      );
+      console.log("removeFiles", removeFiles);
+      // now removes two files
+
+      const removeFilesName = removeFiles.map((file) => file.filename);
+      console.log("removeFilesName", removeFilesName);
+
+      setFormData({
+        ...formData,
+        file: note?.file,
+      });
+
+      // update note
+      await notes.update(id, {
+        title: formData.title,
+        content: formData.content,
+        file: note?.file || [],
+      });
+      // remove files by the loop of remove files call a api
+      removeFilesName.forEach((fileName) => {
+        notes.deleteFile(fileName);
+      });
+      console.log("formData", formData);
+      fetchNote();
       setIsEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update note");
@@ -179,7 +209,7 @@ export default function NodeDetails() {
                       />
                       <Button
                         type="button"
-                        onClick={() => handleDeleteFile(file.fileName)}
+                        onClick={() => handleDeleteFile(file)}
                         variant="ghost"
                         className="absolute top-2 right-2 rounded-full hover:bg-red-100"
                       >

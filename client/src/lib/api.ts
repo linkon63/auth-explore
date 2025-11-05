@@ -49,7 +49,7 @@ export const notes = {
     return response.json();
   },
 
-  update: async (id: string, note: { title: string; content: string }) => {
+  update: async (id: string, note: { title: string; content: string, file: { name: string; url: string }[] }) => {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found');
     const response = await fetch(`${API_URL}/notes/${id}`, {
@@ -76,6 +76,19 @@ export const notes = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to delete note');
+    }
+    return response.json();
+  },
+  deleteFile: async (fileName: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No token found');
+    const response = await fetch(`${API_URL}/upload/${fileName}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete file');
     }
     return response.json();
   },
