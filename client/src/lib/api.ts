@@ -1,4 +1,12 @@
-const API_URL = 'http://localhost:4000';
+export const API_URL = 'http://localhost:4000';
+
+export type Attachment = {
+  fileName: string;
+  url: string;
+  mimeType?: string;
+  size?: number;
+  originalName?: string;
+};
 
 export const auth = {
   login: async (email: string, password: string) => {
@@ -22,7 +30,7 @@ export const notes = {
     );
     return response.json();
   },
-  create: async (note: { title: string; content: string; file: { name: string; url: string }[] }) => {
+  create: async (note: { title: string; content: string; file: Attachment[] }) => {
     const token = localStorage.getItem('token');
     console.log('Creating note with token', token, note);
     if (!token) {
@@ -49,7 +57,7 @@ export const notes = {
     return response.json();
   },
 
-  update: async (id: string, note: { title: string; content: string, file: { name: string; url: string }[] }) => {
+  update: async (id: string, note: { title: string; content: string; file: Attachment[] }) => {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('No token found');
     const response = await fetch(`${API_URL}/notes/${id}`, {

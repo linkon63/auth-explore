@@ -11,11 +11,18 @@ if (!fs.existsSync(uploadDir)) {
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
-const upload = multer({ storage });
+// Allow large files (e.g., videos) without keeping them in memory
+// Adjust the limit if your infra cannot handle the size
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 500 * 1024 * 1024, // 500MB
+  },
+});
 
 module.exports = upload;

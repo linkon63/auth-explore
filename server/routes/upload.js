@@ -12,16 +12,23 @@ const uploadDir = path.join(__dirname, '../uploads');
 
 // Upload files
 router.post('/', authenticateToken, upload.array('files', 10), (req, res) => {
-  console.log("############");
-  console.log('req', req.files);
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: 'No files uploaded' });
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'No files uploaded' });
+    }
+
+    const fileInfos = req.files.map((file) => ({
+      fileName: file.filename,
+      originalName: file.originalname,
+      mimeType: file.mimetype,
+      size: file.size,
+      url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
+    }));
+    res.status(201).json({ files: fileInfos });
+  } catch (err) {
+    console.error('Upload error', err);
+    res.status(500).json({ error: 'Upload failed' });
   }
-  const fileInfos = req.files.map((file) => ({
-    filename: file.filename,
-    url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
-  }));
-  res.status(201).json({ files: fileInfos });
 });
 
 // Delete file
