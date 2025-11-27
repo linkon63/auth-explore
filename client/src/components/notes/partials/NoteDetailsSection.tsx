@@ -1,27 +1,16 @@
 import type { ChangeEvent, Dispatch, SetStateAction } from "react";
-import {
-  FileIcon,
-  NotebookPen,
-  Paperclip,
-  Trash2,
-  MoreHorizontal,
-  Edit,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import type { Note, UploadJob } from "@/types/Note";
+import type { Note, NoteDraft, UploadJob } from "@/types/Note";
 import type { Attachment } from "@/lib/api";
 import NoteDetailsSectionTop from "./NoteDetailsSectionTop";
 import NoteDetailsBody from "./NoteDetailsBody";
 import CreateNote from "./CreateNote";
 
-type NewNoteDraft = { title: string; content: string };
-
 interface NoteDetailsSectionProps {
   isCreating: boolean;
   selectedNote: Note | null;
   setIsCreating: Dispatch<SetStateAction<boolean>>;
-  newNote: NewNoteDraft;
-  setNewNote: Dispatch<SetStateAction<NewNoteDraft>>;
+  newNote: NoteDraft;
+  setNewNote: Dispatch<SetStateAction<NoteDraft>>;
   handleCreateNote: () => Promise<void>;
   handleFileInput: (e: ChangeEvent<HTMLInputElement>) => void;
   handleRemoveAttachment: (fileName: string) => void;
@@ -35,16 +24,16 @@ interface NoteDetailsSectionProps {
 export default function NoteDetailsSection({
   isCreating,
   selectedNote,
-  setIsCreating,
   newNote,
-  setNewNote,
-  handleCreateNote,
-  handleFileInput,
-  handleRemoveAttachment,
   attachments,
   uploadJobs,
   hasActiveUploads,
   isSavingNote,
+  setIsCreating,
+  setNewNote,
+  handleCreateNote,
+  handleFileInput,
+  handleRemoveAttachment,
   deleteNote,
   navigate,
 }: NoteDetailsSectionProps) {
@@ -71,6 +60,7 @@ export default function NoteDetailsSection({
               hasActiveUploads={hasActiveUploads}
               isSavingNote={isSavingNote}
               handleCreateNote={handleCreateNote}
+              setIsCreating={setIsCreating}
             />
           ) : selectedNote ? (
             <NoteDetailsBody selectedNote={selectedNote} />

@@ -9,6 +9,8 @@ export interface Note {
   file?: Attachment[];
 }
 
+export type NoteDraft = Pick<Note, "title" | "content">;
+
 export type UploadJob = {
   id: string;
   name: string;

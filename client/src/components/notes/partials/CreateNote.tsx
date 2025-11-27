@@ -1,9 +1,7 @@
 import { FileIcon, Paperclip } from "lucide-react";
-import type { Note as NewNoteDraft } from "@/types/Note";
+import type { NoteDraft, UploadJob } from "@/types/Note";
 import type { Attachment } from "@/lib/api";
-import type { UploadJob } from "@/types/Note";
-import type { Dispatch, SetStateAction } from "react";
-import type { ChangeEvent } from "react";
+import type { Dispatch, SetStateAction, ChangeEvent } from "react";
 
 export default function CreateNote({
   newNote,
@@ -15,9 +13,10 @@ export default function CreateNote({
   hasActiveUploads,
   isSavingNote,
   handleCreateNote,
+  setIsCreating,
 }: {
-  newNote: NewNoteDraft;
-  setNewNote: Dispatch<SetStateAction<NewNoteDraft>>;
+  newNote: NoteDraft;
+  setNewNote: Dispatch<SetStateAction<NoteDraft>>;
   handleFileInput: (e: ChangeEvent<HTMLInputElement>) => void;
   handleRemoveAttachment: (fileName: string) => void;
   attachments: Attachment[];
@@ -25,6 +24,7 @@ export default function CreateNote({
   hasActiveUploads: boolean;
   isSavingNote: boolean;
   handleCreateNote: () => Promise<void>;
+  setIsCreating: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
     <div>
