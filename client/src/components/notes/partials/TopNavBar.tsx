@@ -9,7 +9,7 @@ export default function TopNavBar({
   setSelectedNote,
   logout,
 }: {
-  fetchNotes: (page: number) => Promise<void>;
+  fetchNotes: (page: number, append?: boolean) => Promise<void>;
   page: number;
   setIsCreating: (value: boolean) => void;
   setSelectedNote: (note: Note | null) => void;

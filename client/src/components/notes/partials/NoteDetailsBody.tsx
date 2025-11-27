@@ -1,6 +1,5 @@
-import type { Attachment } from "@/lib/api";
 import type { Note } from "@/types/Note";
-import { FileIcon } from "lucide-react";
+import { AttachmentPreviewCard } from "./AttachmentPreviewCard";
 
 export default function NoteDetailsBody({
   selectedNote,
@@ -22,61 +21,28 @@ export default function NoteDetailsBody({
           </p>
 
           {selectedNote?.file && selectedNote.file.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-800">Attachments</p>
-              <div className="grid grid-cols-2 gap-3">
-                {selectedNote.file.map((file) => (
-                  <div
-                    key={file.fileName}
-                    className="rounded-lg border border-slate-200 bg-white p-2"
-                  >
-                    {renderAttachmentPreview(file)}
-                  </div>
-                ))}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-800">Attachments</p>
+                <span className="text-xs font-medium text-slate-500">
+                  {selectedNote.file.length} file
+                  {selectedNote.file.length === 1 ? "" : "s"}
+                </span>
               </div>
-            </div>
+              <div className="max-h-[32rem] overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {selectedNote.file.map((file) => (
+                    <AttachmentPreviewCard
+                      key={file.fileName}
+                      attachment={file}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
           )}
         </div>
       </div>
     </div>
   );
 }
-
-const renderAttachmentPreview = (attachment: Attachment) => {
-  const isImage = attachment.mimeType?.startsWith("image");
-  const isVideo = attachment.mimeType?.startsWith("video");
-
-  if (isVideo) {
-    return (
-      <video
-        controls
-        className="w-full h-40 object-cover rounded-xl border border-slate-200 bg-slate-100"
-        src={attachment.url}
-      />
-    );
-  }
-
-  if (isImage) {
-    return (
-      <img
-        src={attachment.url}
-        alt={attachment.fileName}
-        className="w-full h-40 object-cover rounded-xl border border-slate-200 bg-slate-100"
-      />
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-slate-800">
-      <FileIcon className="h-4 w-4 text-slate-500" />
-      <a
-        href={attachment.url}
-        target="_blank"
-        rel="noreferrer"
-        className="text-sm underline underline-offset-2 text-amber-600 truncate"
-      >
-        {attachment.originalName || attachment.fileName}
-      </a>
-    </div>
-  );
-};

@@ -2,6 +2,7 @@ import { FileIcon, Paperclip } from "lucide-react";
 import type { NoteDraft, UploadJob } from "@/types/Note";
 import type { Attachment } from "@/lib/api";
 import type { Dispatch, SetStateAction, ChangeEvent } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function CreateNote({
   newNote,
@@ -27,8 +28,29 @@ export default function CreateNote({
   setIsCreating: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
-    <div>
-      <div className="h-full min-h-0 overflow-y-auto px-6 py-5 space-y-4">
+    <div className="flex h-full flex-col">
+      <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-6 py-3 backdrop-blur">
+        <Button
+          onClick={() => handleCreateNote()}
+          className="bg-slate-900 text-white shadow-sm hover:bg-slate-800"
+          disabled={hasActiveUploads || isSavingNote}
+        >
+          {hasActiveUploads
+            ? "Uploading..."
+            : isSavingNote
+            ? "Saving..."
+            : "Save note"}
+        </Button>
+        <Button
+          variant="outline"
+          className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          onClick={() => setIsCreating(false)}
+        >
+          Cancel
+        </Button>
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-y px-6 py-5 space-y-4">
         <input
           type="text"
           placeholder="Title"
@@ -91,45 +113,26 @@ export default function CreateNote({
         {attachments.length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-slate-800">Attached files</p>
-            <div className="grid grid-cols-2 gap-3">
-              {attachments.map((file) => (
-                <div
-                  key={file.fileName}
-                  className="relative group overflow-hidden rounded-lg border border-slate-200 bg-white"
-                >
-                  {renderAttachmentPreview(file)}
-                  <button
-                    onClick={() => handleRemoveAttachment(file.fileName)}
-                    className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600 opacity-0 shadow-sm transition group-hover:opacity-100"
+            <div className="max-h-[28rem] min-h-0 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {attachments.map((file) => (
+                  <div
+                    key={file.fileName}
+                    className="relative group overflow-hidden rounded-lg border border-slate-200 bg-white"
                   >
-                    x
-                  </button>
-                </div>
-              ))}
+                    {renderAttachmentPreview(file)}
+                    <button
+                      onClick={() => handleRemoveAttachment(file.fileName)}
+                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white text-red-600 opacity-0 shadow-sm transition group-hover:opacity-100"
+                    >
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
-
-        <div className="flex flex-wrap gap-3">
-          <Button
-            onClick={() => handleCreateNote()}
-            className="bg-slate-900 text-white shadow-sm hover:bg-slate-800"
-            disabled={hasActiveUploads || isSavingNote}
-          >
-            {hasActiveUploads
-              ? "Uploading..."
-              : isSavingNote
-              ? "Saving..."
-              : "Save note"}
-          </Button>
-          <Button
-            variant="outline"
-            className="border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-            onClick={() => setIsCreating(false)}
-          >
-            Cancel
-          </Button>
-        </div>
       </div>
     </div>
   );

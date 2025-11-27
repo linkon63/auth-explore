@@ -10,7 +10,7 @@ interface SidebarTopBarProps {
   totalPages: number;
   hasNotes: boolean;
   selectedNote: Note | null;
-  fetchNotes: (page: number) => Promise<void>;
+  fetchNotes: (page: number, append?: boolean) => Promise<void>;
   selectNote: (note: Note) => void;
 }
 
@@ -27,8 +27,8 @@ export default function SidebarTopBar({
   selectNote,
 }: SidebarTopBarProps) {
   return (
-    <div>
-      <aside className="flex h-full min-h-0 flex-col rounded-2xl border border-slate-200 bg-white shadow-lg shadow-black/10">
+    <div className="h-full min-h-0">
+      <aside className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-black/10">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
@@ -59,7 +59,7 @@ export default function SidebarTopBar({
               !isLoading &&
               page < totalPages
             ) {
-              fetchNotes(page + 1);
+              fetchNotes(page + 1, true);
             }
           }}
         >
