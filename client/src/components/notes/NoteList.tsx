@@ -1,23 +1,14 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
-import {
-  Trash2,
-  Edit,
-  File as FileIcon,
-  NotebookPen,
-  Paperclip,
-  MoreHorizontal,
-} from "lucide-react";
 import { notes, API_URL } from "@/lib/api";
 import type { Attachment } from "@/lib/api";
 import type { Note, UploadJob } from "@/types/Note";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/src/contexts/AuthContext";
-import TopNavBar from "@/components/notes/partials/TopNavBar";
-import SidebarTopBar from "@/components/notes/partials/SidebarTopBar";
 import NoteError from "./partials/NoteError";
 import NoteDetailsSection from "./partials/NoteDetailsSection";
+import SidebarTopBar from "./partials/SidebarTopBar";
+import TopNavBar from "./partials/TopNavBar";
 
 export function NoteList() {
   const navigate = useNavigate();
