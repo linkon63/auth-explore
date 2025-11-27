@@ -4,10 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-
 import { useAuth } from '@/src/contexts/AuthContext';
-import { Apple, Lock, Mail } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -45,7 +43,7 @@ export function LoginForm() {
       
       // If we have a token, call the login function from AuthContext
       if (response.token) {
-        navigate('/');
+        navigate('/notes');
       } else {
         throw new Error('No token received');
       }
